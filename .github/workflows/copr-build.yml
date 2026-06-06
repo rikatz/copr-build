@@ -25,7 +25,7 @@ jobs:
             exit 1
           fi
 
-          status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+          status=$(curl -H "Content-Type: application/json" --silent --output /dev/null --write-out '%{http_code}' \
             -X POST "${COPR_WEBHOOK_URL}")
           if [ "${status}" -ge 200 ] && [ "${status}" -lt 300 ]; then
             echo "COPR webhook triggered successfully (HTTP ${status})"
