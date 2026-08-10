@@ -1,4 +1,4 @@
-name: Trigger COPR build
+name: Trigger COPR build for RTK
 
 on:
   push:
@@ -15,10 +15,10 @@ concurrency:
 
 jobs:
   trigger:
-    name: Trigger COPR webhook
+    name: Trigger COPR webhook for RTK
     runs-on: ubuntu-latest
     steps:
-      - name: Call COPR webhook
+      - name: Call COPR webhook for RTK
         env:
           COPR_WEBHOOK_URL: ${{ secrets.COPR_WEBHOOK_URL }}
         run: |
