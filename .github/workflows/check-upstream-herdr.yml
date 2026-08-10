@@ -1,8 +1,8 @@
-name: Check upstream release
+name: Check upstream release for HERDR
 
 on:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "32 */6 * * *"
   workflow_dispatch:
 
 permissions: {}
@@ -12,11 +12,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-and-bump:
-    name: Check and bump RTK version
+  check-and-bump-herdr:
+    name: Check and bump HERDR version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # tag=v6.0.3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           ref: main
           persist-credentials: false
@@ -26,14 +26,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          latest=$(gh api repos/rtk-ai/rtk/releases/latest --jq '.tag_name' | sed 's/^v//')
+          latest=$(gh api repos/herdrdev/herdr/releases/latest --jq '.tag_name' | sed 's/^v//')
           echo "version=${latest}" >> "$GITHUB_OUTPUT"
           echo "Upstream latest: ${latest}"
 
       - name: Get current spec version
         id: current
         run: |
-          current=$(grep '^Version:' rtk.spec | awk '{print $2}')
+          current=$(grep '^Version:' herdr.spec | awk '{print $2}')
           echo "version=${current}" >> "$GITHUB_OUTPUT"
           echo "Spec current: ${current}"
 
@@ -45,12 +45,12 @@ jobs:
         run: |
           echo "Bumping spec to ${UPSTREAM_VERSION}"
 
-          sed -i "s/^Version:.*/Version:        ${UPSTREAM_VERSION}/" rtk.spec
+          sed -i "s/^Version:.*/Version:        ${UPSTREAM_VERSION}/" herdr.spec
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           remote_url="https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git remote set-url origin "${remote_url}"
-          git add rtk.spec
-          git commit -m "Bump rtk to ${UPSTREAM_VERSION}"
+          git add herdr.spec
+          git commit -m "Bump herdr to ${UPSTREAM_VERSION}"
           git push
