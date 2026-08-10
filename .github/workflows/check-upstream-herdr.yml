@@ -1,0 +1,56 @@
+name: Check upstream release for HERDR
+
+on:
+  schedule:
+    - cron: "32 */6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: check-upstream
+  cancel-in-progress: true
+
+jobs:
+  check-and-bump-herdr:
+    name: Check and bump HERDR version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # tag=v6.0.3
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Get latest upstream release
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api repos/herdrdev/herdr/releases/latest --jq '.tag_name' | sed 's/^v//')
+          echo "version=${latest}" >> "$GITHUB_OUTPUT"
+          echo "Upstream latest: ${latest}"
+
+      - name: Get current spec version
+        id: current
+        run: |
+          current=$(grep '^Version:' herdr.spec | awk '{print $2}')
+          echo "version=${current}" >> "$GITHUB_OUTPUT"
+          echo "Spec current: ${current}"
+
+      - name: Bump spec version
+        if: steps.upstream.outputs.version != steps.current.outputs.version
+        env:
+          UPSTREAM_VERSION: ${{ steps.upstream.outputs.version }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          echo "Bumping spec to ${UPSTREAM_VERSION}"
+
+          sed -i "s/^Version:.*/Version:        ${UPSTREAM_VERSION}/" herdr.spec
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          remote_url="https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git remote set-url origin "${remote_url}"
+          git add herdr.spec
+          git commit -m "Bump herdr to ${UPSTREAM_VERSION}"
+          git push
