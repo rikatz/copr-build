@@ -9,7 +9,7 @@ Source:         %{url}/archive/refs/tags/v%{version}.tar.gz
 
 BuildRequires:  cargo >= 1.91
 BuildRequires:  rust >= 1.91
-BuildRequires:  zig >= 0.15
+BuildRequires:  zig = 0.15.2
 BuildRequires:  gcc
 BuildRequires:  cmake
 ExclusiveArch:  %{rust_arches}
