@@ -1,5 +1,5 @@
 Name:           herdr
-Version:        0.9.1
+Version:        0.9.3
 Release:        %autorelease
 Summary:        the runtime your coding agents live on
 
