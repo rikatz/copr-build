@@ -1,4 +1,4 @@
-name: Trigger COPR build for RTK
+name: Trigger COPR build for HERDR
 
 on:
   push:
