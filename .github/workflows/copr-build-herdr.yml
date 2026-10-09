@@ -1,0 +1,37 @@
+name: Trigger COPR build for RTK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "herdr.spec"
+
+permissions: {}
+
+concurrency:
+  group: copr-build
+  cancel-in-progress: true
+
+jobs:
+  trigger:
+    name: Trigger COPR webhook for HERDR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call COPR webhook for HERDR
+        env:
+          COPR_WEBHOOK_URL_HERDR: ${{ secrets.COPR_WEBHOOK_URL_HERDR }}
+        run: |
+          if [ -z "${COPR_WEBHOOK_URL_HERDR}" ]; then
+            echo "::error::COPR_WEBHOOK_URL_HERDR secret is not set"
+            exit 1
+          fi
+
+          status=$(curl -H "Content-Type: application/json" --silent --output /dev/null --write-out '%{http_code}' \
+            -X POST "${COPR_WEBHOOK_URL_HERDR}")
+          if [ "${status}" -ge 200 ] && [ "${status}" -lt 300 ]; then
+            echo "COPR webhook triggered successfully (HTTP ${status})"
+          else
+            echo "::error::COPR webhook returned HTTP ${status}"
+            exit 1
+          fi

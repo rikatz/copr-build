@@ -5,6 +5,7 @@ RPM spec files and automation for building packages on [Fedora COPR](https://cop
 ## Packages
 
 - **rtk** — [rtk-ai/rtk](https://github.com/rtk-ai/rtk), a CLI proxy that reduces LLM token consumption by 60-90%.
+- **herdr** — [herdrdev/herdr](https://github.com/herdrdev/herdr), a multiplexer for coding agents
 
 ## Automation
 
