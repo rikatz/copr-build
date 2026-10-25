@@ -1,5 +1,5 @@
 Name:           rtk
-Version:        1.0.1
+Version:        1.1.0
 Release:        %autorelease
 Summary:        CLI proxy that reduces LLM token consumption by 60-90% on common dev commands
 
